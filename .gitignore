@@ -17,3 +17,7 @@ yarn-error.log*
 # System Files
 .DS_Store
 Thumbs.db
+
+# Mock Database
+config/mockDb.json
+
