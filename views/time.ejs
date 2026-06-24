@@ -1,0 +1,236 @@
+<%- include('./partials/header') %>
+
+<div class="card-header" style="margin-bottom: 2rem;">
+  <div>
+    <h1 style="font-size: 2rem; font-weight: 800;">Time & Chores Budgeter</h1>
+    <p style="color: var(--text-muted);">Configure weekly targets and log actual study, coding, and chore hours.</p>
+  </div>
+  <div>
+    <!-- Week Selector Navigation -->
+    <div style="display: flex; align-items: center; gap: 0.5rem; background: var(--bg-glass); border: 1px solid var(--border-glass); padding: 0.5rem 1rem; border-radius: var(--radius-sm);">
+      <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.85rem;" onclick="changeWeek(-7)"><i class="fa-solid fa-chevron-left"></i></button>
+      <span style="font-weight: 600; font-size: 0.9rem;" id="weekDisplay">Week starting: <%= week %></span>
+      <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.85rem;" onclick="changeWeek(7)"><i class="fa-solid fa-chevron-right"></i></button>
+    </div>
+  </div>
+</div>
+
+<% if (typeof error !== 'undefined' && error) { %>
+  <div class="alert alert-danger"><%= error %></div>
+<% } %>
+<% if (typeof success !== 'undefined' && success) { %>
+  <div class="alert alert-success"><%= success %></div>
+<% } %>
+
+<!-- Weekly Totals Card -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+  <div class="glass-card" style="border-left: 4px solid var(--primary);">
+    <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Total Target Budget</div>
+    <div style="font-size: 1.75rem; font-weight: 800; margin-top: 0.25rem;"><%= totalTarget.toFixed(1) %> hrs / week</div>
+  </div>
+  <div class="glass-card" style="border-left: 4px solid var(--secondary);">
+    <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Total Actual Logged</div>
+    <div style="font-size: 1.75rem; font-weight: 800; margin-top: 0.25rem;"><%= totalActual.toFixed(1) %> hrs logged</div>
+  </div>
+  <div class="glass-card" style="border-left: 4px solid var(--success);">
+    <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Completion Rate</div>
+    <% 
+      const rate = totalTarget > 0 ? Math.round((totalActual / totalTarget) * 100) : 0;
+    %>
+    <div style="font-size: 1.75rem; font-weight: 800; margin-top: 0.25rem; color: var(--success);"><%= rate %>% Completed</div>
+  </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start;">
+  
+  <!-- Left Side: Category Tracking Progress & Visual Chart -->
+  <div style="display: flex; flex-direction: column; gap: 2rem;">
+    <!-- Progress List -->
+    <div class="glass-card">
+      <div class="card-header">
+        <h3 style="font-weight: 700;"><i class="fa-solid fa-list-check" style="color: var(--primary);"></i> Weekly Breakdown</h3>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 1.25rem; margin-top: 1rem;">
+        <% budgets.forEach(b => { %>
+          <% 
+            const pct = b.target > 0 ? Math.min(100, Math.round((b.actual / b.target) * 100)) : 0; 
+          %>
+          <div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 0.4rem;">
+              <span style="font-weight: 600;"><%= b.name %></span>
+              <span style="color: var(--text-muted); font-size: 0.85rem;">
+                <strong style="color: var(--text-main);"><%= b.actual.toFixed(1) %></strong> / <%= b.target.toFixed(1) %> hrs (<%= pct %>%)
+              </span>
+            </div>
+            <div class="progress-bar-container">
+              <div class="progress-bar-fill <%= b.id === 'chores_errands' ? 'chores-bar' : '' %>" data-pct="<%= pct %>"></div>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="glass-card">
+      <div class="card-header">
+        <h3 style="font-weight: 700;"><i class="fa-solid fa-chart-bar" style="color: var(--secondary);"></i> Targets vs. Actual Logs</h3>
+      </div>
+      <div style="margin-top: 1rem; position: relative; height: 280px; width: 100%;">
+        <canvas id="timeChart" 
+                data-categories="<%= JSON.stringify(budgets.map(b => b.name)) %>"
+                data-targets="<%= JSON.stringify(budgets.map(b => b.target)) %>"
+                data-actuals="<%= JSON.stringify(budgets.map(b => b.actual)) %>"
+                data-week="<%= week %>"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Side: Forms for Action -->
+  <div style="display: flex; flex-direction: column; gap: 2rem;">
+    <!-- Form to Log Hours -->
+    <div class="glass-card">
+      <div class="card-header">
+        <h3 style="font-weight: 700;"><i class="fa-solid fa-hourglass-half" style="color: var(--primary);"></i> Log Actual Time</h3>
+      </div>
+      <form action="/time/log" method="POST" style="margin-top: 1rem;">
+        <input type="hidden" name="week_start_date" value="<%= week %>">
+        
+        <div class="form-group">
+          <label for="log_category" class="form-label">Category *</label>
+          <select id="log_category" name="category" class="form-control" required>
+            <% budgets.forEach(b => { %>
+              <option value="<%= b.id %>"><%= b.name %></option>
+            <% }) %>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="hours" class="form-label">Hours Logged *</label>
+          <input type="number" step="0.25" id="hours" name="hours" class="form-control" placeholder="E.g. 1.5, 2" required min="0.1">
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">
+          Log Activity Hours <i class="fa-solid fa-clock"></i>
+        </button>
+      </form>
+    </div>
+
+    <!-- Form to Edit Weekly targets -->
+    <div class="glass-card">
+      <div class="card-header" onclick="toggleTargetsForm()" style="cursor: pointer;">
+        <h3 style="font-weight: 700;"><i class="fa-solid fa-sliders" style="color: var(--secondary);"></i> Configure Week Targets</h3>
+        <span style="font-size: 0.8rem; color: var(--text-muted);"><i class="fa-solid fa-chevron-down" id="toggleIcon"></i></span>
+      </div>
+      <div id="targetsFormContainer" style="display: none; margin-top: 1rem;">
+        <form action="/time/setup" method="POST">
+          <input type="hidden" name="week_start_date" value="<%= week %>">
+          
+          <% budgets.forEach(b => { %>
+            <div class="form-group" style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; align-items: center; margin-bottom: 0.75rem;">
+              <label for="target-<%= b.id %>" class="form-label" style="margin-bottom: 0;"><%= b.name %></label>
+              <input type="number" step="1" id="target-<%= b.id %>" name="targets[<%= b.id %>]" class="form-control" value="<%= b.target %>" required min="0">
+            </div>
+          <% }) %>
+
+          <button type="submit" class="btn btn-secondary" style="width: 100%; margin-top: 1rem; border-color: var(--secondary); color: var(--secondary);">
+            Save Weekly Targets <i class="fa-solid fa-floppy-disk"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Chart.js Configuration
+  document.addEventListener('DOMContentLoaded', () => {
+
+    const ctx = document.getElementById('timeChart').getContext('2d');
+    
+    const chartEl = document.getElementById('timeChart');
+    const categories = JSON.parse(chartEl.dataset.categories || '[]');
+    const targets = JSON.parse(chartEl.dataset.targets || '[]').map(Number);
+    const actuals = JSON.parse(chartEl.dataset.actuals || '[]').map(Number);
+
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: categories.map(c => c.split(' / ')[0].split(', ')[0]), // Clean titles slightly
+        datasets: [
+          {
+            label: 'Target (Hours)',
+            data: targets,
+            backgroundColor: 'rgba(99, 102, 241, 0.4)',
+            borderColor: '#6366f1',
+            borderWidth: 1.5,
+            borderRadius: 4
+          },
+          {
+            label: 'Actual (Hours)',
+            data: actuals,
+            backgroundColor: 'rgba(168, 85, 247, 0.4)',
+            borderColor: '#a855f7',
+            borderWidth: 1.5,
+            borderRadius: 4
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: {
+              color: 'rgba(255, 255, 255, 0.05)'
+            },
+            ticks: {
+              color: '#9ca3af'
+            }
+          },
+          x: {
+            grid: {
+              display: false
+            },
+            ticks: {
+              color: '#9ca3af',
+              font: {
+                size: 9
+              }
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            labels: {
+              color: '#f3f4f6'
+            }
+          }
+        }
+      }
+    });
+  });
+
+  function toggleTargetsForm() {
+    const container = document.getElementById('targetsFormContainer');
+    const icon = document.getElementById('toggleIcon');
+    if(container.style.display === 'none') {
+      container.style.display = 'block';
+      icon.className = 'fa-solid fa-chevron-up';
+    } else {
+      container.style.display = 'none';
+      icon.className = 'fa-solid fa-chevron-down';
+    }
+  }
+
+  function changeWeek(days) {
+    const currentWeekStr = document.getElementById('timeChart').dataset.week;
+    const date = new Date(currentWeekStr);
+    date.setDate(date.getDate() + days);
+    const dateStr = date.toISOString().split('T')[0];
+    window.location.href = `/time?week=${dateStr}`;
+  }
+</script>
+
+<%- include('./partials/footer') %>

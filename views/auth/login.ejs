@@ -1,0 +1,43 @@
+<%- include('../partials/header') %>
+
+<div class="auth-container">
+  <div class="glass-card auth-card-login">
+    <div class="auth-header">
+      <h2 class="auth-title">
+        Student Life OS
+      </h2>
+      <p>Hostel & PG Companion for BTech Students</p>
+    </div>
+
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="alert alert-danger"><%= error %></div>
+    <% } %>
+    <% if (typeof success !== 'undefined' && success) { %>
+      <div class="alert alert-success"><%= success %></div>
+    <% } %>
+
+    <form action="/auth/login" method="POST">
+      <div class="form-group">
+        <label for="email" class="form-label">College Email Address</label>
+        <input type="email" id="email" name="email" class="form-control" placeholder="you@college.edu" required autocomplete="email">
+      </div>
+      
+      <div class="form-group">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+      </div>
+
+      <button type="submit" class="btn btn-primary auth-btn">
+        Sign In <i class="fa-solid fa-right-to-bracket"></i>
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <span>New PG student here?</span>
+      <a href="/auth/register">Create Account</a>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>
+

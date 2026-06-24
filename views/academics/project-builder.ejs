@@ -1,0 +1,181 @@
+<%- include('../partials/header') %>
+
+<div class="card-header" style="margin-bottom: 2rem;">
+  <div>
+    <h1 style="font-size: 2rem; font-weight: 800;">Academic Accelerator Hub</h1>
+    <p style="color: var(--text-muted);">Explain concepts two ways, find BTech concept gaps, translate labs, and scope out projects.</p>
+  </div>
+</div>
+
+<!-- Academics Sub-Navigation Tabs -->
+<div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2rem; border-bottom: 1px solid var(--border-glass); padding-bottom: 1rem;">
+  <a href="/academics/explain" class="btn btn-secondary"><i class="fa-solid fa-graduation-cap"></i> Concept Explainer</a>
+  <a href="/academics/labs" class="btn btn-secondary"><i class="fa-solid fa-code-fork"></i> Lab-to-Life Translator</a>
+  <a href="/academics/project-builder" class="btn btn-secondary active"><i class="fa-solid fa-diagram-project"></i> Project Scoper</a>
+  <a href="/exams" class="btn btn-secondary"><i class="fa-solid fa-pen-to-square"></i> One-Night-Before Exams</a>
+</div>
+
+<% if (typeof error !== 'undefined' && error) { %>
+  <div class="alert alert-danger"><%= error %></div>
+<% } %>
+<% if (typeof success !== 'undefined' && success) { %>
+  <div class="alert alert-success"><%= success %></div>
+<% } %>
+
+<!-- Two Column Layout: Scoper Wizard on Left, Saved Roadmaps on Right -->
+<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; align-items: start;">
+  
+  <!-- Left Side: Project Wizard Form -->
+  <div class="glass-card">
+    <div class="card-header">
+      <h3 style="font-weight: 700;"><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--primary);"></i> Project Scoper Wizard</h3>
+    </div>
+    
+    <form action="/academics/project-builder" method="POST" style="margin-top: 1rem;">
+      <div class="form-group">
+        <label for="title" class="form-label">Project Title *</label>
+        <input type="text" id="title" name="title" class="form-control" placeholder="E.g. Chat Application, Portfolio" required>
+      </div>
+
+      <div class="form-group">
+        <label for="description" class="form-label">Brief Description</label>
+        <textarea id="description" name="description" class="form-control" rows="3" placeholder="E.g. A real-time chat application with group channels and file sharing."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="tech_stack" class="form-label">Tech Stack (comma-separated) *</label>
+        <input type="text" id="tech_stack" name="tech_stack" class="form-control" placeholder="E.g. React, Node.js, Express, MongoDB" required>
+      </div>
+
+      <div class="form-group">
+        <label for="difficulty" class="form-label">Complexity / Scope Level *</label>
+        <select id="difficulty" name="difficulty" class="form-control" required>
+          <option value="beginner">Beginner (1-2 days sessional setup)</option>
+          <option value="intermediate" selected>Intermediate (1-2 weeks detailed code)</option>
+          <option value="advanced">Advanced (3-4 weeks cluster architecture)</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">
+        Generate Project Scope <i class="fa-solid fa-gears"></i>
+      </button>
+    </form>
+  </div>
+
+  <!-- Right Side: Saved Project Roadmaps -->
+  <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+    
+    <div class="glass-card" style="border-top: 4px solid var(--secondary);">
+      <div class="card-header">
+        <h3 style="font-weight: 700;"><i class="fa-solid fa-list-check" style="color: var(--secondary);"></i> Generated Project Scopes</h3>
+      </div>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem; margin-bottom: 1.5rem;">
+        Track your custom milestones to make sure you finish the project and don't end up leaving it halfway.
+      </p>
+
+      <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        <% if (savedProjects && savedProjects.length > 0) { %>
+          <% savedProjects.forEach(project => { %>
+            <div class="glass-card" style="padding: 1.5rem; border-color: rgba(255,255,255,0.06);">
+              <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+                <div>
+                  <h4 style="font-size: 1.2rem; font-weight: 800; color: #fff;"><%= project.title %></h4>
+                  <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem;">Stack: <span style="color: var(--primary); font-weight: 600;"><%= project.tech_stack %></span></p>
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <span class="badge badge-<%= project.difficulty === 'advanced' ? 'danger' : (project.difficulty === 'intermediate' ? 'warning' : 'success') %>">
+                    <%= project.difficulty %>
+                  </span>
+                  
+                  <form action="/academics/project-builder/<%= project.id %>/delete" method="POST" onsubmit="return confirm('Delete this project scope?');">
+                    <button type="submit" class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem; color: var(--danger); border-color: rgba(239, 68, 68, 0.2);">
+                      <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                  </form>
+                </div>
+              </div>
+
+              <% if(project.description) { %>
+                <p style="font-size: 0.9rem; line-height: 1.4; color: var(--text-muted); margin-bottom: 1rem; padding: 0.75rem; background: rgba(255,255,255,0.01); border-radius: var(--radius-sm);">
+                  <%= project.description %>
+                </p>
+              <% } %>
+
+              <!-- Milestones rendering -->
+              <% 
+                let milestonesData = [];
+                try {
+                  milestonesData = typeof project.milestones === 'string' ? JSON.parse(project.milestones) : project.milestones;
+                } catch(err) {
+                  milestonesData = [];
+                }
+              %>
+
+              <div style="margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1rem;">
+                <h5 style="font-weight: 700; font-size: 0.9rem; text-transform: uppercase; color: var(--primary); margin-bottom: 0.75rem;">Implementation Roadmap</h5>
+                
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                  <% milestonesData.forEach((milestone, idx) => { %>
+                    <div style="background: rgba(255, 255, 255, 0.01); border: 1px solid var(--border-glass); border-radius: var(--radius-sm); padding: 0.75rem 1rem;">
+                      <div style="font-weight: 700; font-size: 0.85rem; color: var(--secondary); margin-bottom: 0.4rem;">
+                        <%= milestone.phase %>
+                      </div>
+                      
+                      <ul style="list-style: none; padding-left: 0; display: flex; flex-direction: column; gap: 0.25rem;">
+                        <% milestone.tasks.forEach((task, tIdx) => { %>
+                          <li style="font-size: 0.8rem; display: flex; align-items: start; gap: 0.4rem; color: var(--text-muted);">
+                            <input type="checkbox" id="check-<%= project.id %>-<%= idx %>-<%= tIdx %>" style="margin-top: 0.15rem; cursor: pointer;" onclick="saveCheckState(this.id)">
+                            <label for="check-<%= project.id %>-<%= idx %>-<%= tIdx %>" style="cursor: pointer;"><%= task %></label>
+                          </li>
+                        <% }) %>
+                      </ul>
+                    </div>
+                  <% }) %>
+                </div>
+              </div>
+
+            </div>
+          <% }) %>
+        <% } else { %>
+          <div style="text-align: center; padding: 3rem 1.5rem; color: var(--text-muted);" class="glass-card">
+            <i class="fa-solid fa-diagram-project" style="font-size: 3rem; margin-bottom: 1rem; color: var(--text-muted); display: block;"></i>
+            <p>No project scope templates created.</p>
+            <p style="font-size: 0.8rem; margin-top: 0.5rem;">Use the scoper wizard on the left to quickly structure backend database schemas, APIs, and production deployment paths.</p>
+          </div>
+        <% } %>
+      </div>
+      
+    </div>
+    
+  </div>
+
+</div>
+
+<script>
+  // Simple localStorage logic to persist check state across reloads
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      const isChecked = localStorage.getItem(cb.id) === 'true';
+      cb.checked = isChecked;
+      if (isChecked) {
+        cb.nextElementSibling.style.textDecoration = 'line-through';
+        cb.nextElementSibling.style.color = 'var(--text-muted)';
+      }
+    });
+  });
+
+  function saveCheckState(id) {
+    const cb = document.getElementById(id);
+    localStorage.setItem(id, cb.checked);
+    if (cb.checked) {
+      cb.nextElementSibling.style.textDecoration = 'line-through';
+      cb.nextElementSibling.style.color = 'var(--text-muted)';
+    } else {
+      cb.nextElementSibling.style.textDecoration = 'none';
+      cb.nextElementSibling.style.color = 'var(--text-main)';
+    }
+  }
+</script>
+
+<%- include('../partials/footer') %>

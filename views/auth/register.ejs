@@ -1,0 +1,77 @@
+<%- include('../partials/header') %>
+
+<div class="auth-container">
+  <div class="glass-card auth-card-register">
+    <div class="auth-header-register">
+      <h2 class="auth-title-register">
+        Create Student Profile
+      </h2>
+      <p>Setup your BTech Hostel Life & Placement dashboard</p>
+    </div>
+
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="alert alert-danger"><%= error %></div>
+    <% } %>
+
+    <form action="/auth/register" method="POST">
+      <div class="form-group">
+        <label for="name" class="form-label">Full Name *</label>
+        <input type="text" id="name" name="name" class="form-control" placeholder="Rahul Sharma" required autocomplete="name">
+      </div>
+
+      <div class="form-group">
+        <label for="email" class="form-label">Email Address *</label>
+        <input type="email" id="email" name="email" class="form-control" placeholder="rahul@college.edu" required autocomplete="email">
+      </div>
+
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label for="branch" class="form-label">BTech Branch</label>
+          <select id="branch" name="branch" class="form-control">
+            <option value="CSE">CSE / IT</option>
+            <option value="ECE">ECE / EEE</option>
+            <option value="ME">Mechanical</option>
+            <option value="CE">Civil</option>
+            <option value="Other">Other Branch</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="year_of_study" class="form-label">Year of Study</label>
+          <select id="year_of_study" name="year_of_study" class="form-control">
+            <option value="1">1st Year</option>
+            <option value="2">2nd Year</option>
+            <option value="3">3rd Year</option>
+            <option value="4">4th Year</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="college" class="form-label">College / University Name</label>
+        <input type="text" id="college" name="college" class="form-control" placeholder="IIT / NIT / State College">
+      </div>
+
+      <div class="form-group">
+        <label for="password" class="form-label">Password *</label>
+        <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required autocomplete="new-password">
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword" class="form-label">Confirm Password *</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" placeholder="••••••••" required autocomplete="new-password">
+      </div>
+
+      <button type="submit" class="btn btn-primary auth-btn">
+        Register Account <i class="fa-solid fa-user-plus"></i>
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <span>Already registered?</span>
+      <a href="/auth/login">Sign In</a>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>
+

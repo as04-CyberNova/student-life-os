@@ -1,0 +1,284 @@
+<%- include('./partials/header') %>
+
+<div class="card-header" style="margin-bottom: 2rem;">
+  <div>
+    <h1 style="font-size: 2rem; font-weight: 800;">Finance Hub & Splits</h1>
+    <p style="color: var(--text-muted);">Manage your monthly allowance, rent, mess fees, and roommate splits.</p>
+  </div>
+  <div style="display: flex; gap: 1rem;">
+    <!-- Quick stats badge -->
+  </div>
+</div>
+
+<% if (typeof error !== 'undefined' && error) { %>
+  <div class="alert alert-danger"><%= error %></div>
+<% } %>
+<% if (typeof success !== 'undefined' && success) { %>
+  <div class="alert alert-success"><%= success %></div>
+<% } %>
+
+<!-- Summary Cards Grid -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+  
+  <div class="glass-card border-card-primary" style="display: flex; align-items: center; justify-content: space-between;">
+    <div>
+      <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Month Spent</div>
+      <div style="font-size: 2rem; font-weight: 800; margin-top: 0.25rem;">₹<%= totalSpentMonth.toFixed(2) %></div>
+    </div>
+    <div class="badge-circle-primary">
+      <i class="fa-solid fa-wallet"></i>
+    </div>
+  </div>
+
+  <div class="glass-card border-card-secondary" style="display: flex; align-items: center; justify-content: space-between;">
+    <div>
+      <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Net Roommate Balance</div>
+      <% 
+        let netSplit = 0;
+        balances.forEach(b => netSplit += parseFloat(b.net_balance || 0));
+      %>
+      <div style="font-size: 2rem; font-weight: 800; margin-top: 0.25rem;" class="<%= netSplit >= 0 ? 'text-positive' : 'text-negative' %>">
+        <%= netSplit >= 0 ? '+' : '-' %>₹<%= Math.abs(netSplit).toFixed(2) %>
+      </div>
+    </div>
+
+    <div class="badge-circle-secondary">
+      <i class="fa-solid fa-users"></i>
+    </div>
+  </div>
+
+</div>
+
+<!-- Primary Two Column Workspace Grid -->
+<div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 2rem; align-items: start;">
+  
+  <!-- LEFT COLUMN: Personal Ledger -->
+  <div style="display: flex; flex-direction: column; gap: 2rem;">
+    <!-- Log Transaction Form -->
+    <div class="glass-card">
+      <div class="card-header">
+        <h3 style="font-weight: 700;"><i class="fa-solid fa-plus-circle" style="color: var(--primary);"></i> Log Personal Expense</h3>
+      </div>
+      <form action="/budget/transaction" method="POST" style="margin-top: 1rem;">
+        <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 1rem;">
+          <div class="form-group">
+            <label for="amount" class="form-label">Amount (INR) *</label>
+            <input type="number" step="0.01" id="amount" name="amount" class="form-control" placeholder="0.00" required>
+          </div>
+          <div class="form-group">
+            <label for="category" class="form-label">Category *</label>
+            <select id="category" name="category" class="form-control" required>
+              <option value="mess_food">Mess / Food</option>
+              <option value="rent_pg">PG / Hostel Rent</option>
+              <option value="snacks_cravings">Snacks & Late Night Cravings</option>
+              <option value="travel">Travel & Cab runs</option>
+              <option value="laundry_recharges">Laundry / Recharges</option>
+              <option value="stationery">Stationery & Books</option>
+              <option value="others">Other Expenses</option>
+            </select>
+          </div>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label for="description" class="form-label">Description / Note</label>
+            <input type="text" id="description" name="description" class="form-control" placeholder="E.g. Maggi pack, Metro ticket">
+          </div>
+          <div class="form-group">
+            <label for="transaction_date" class="form-label">Date *</label>
+            <input type="date" id="transaction_date" name="transaction_date" class="form-control" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem; width: 100%;">
+          Record Expense <i class="fa-solid fa-check"></i>
+        </button>
+      </form>
+    </div>
+
+    <!-- Personal Transaction History -->
+    <div class="glass-card">
+      <div class="card-header">
+        <h3 style="font-weight: 700;"><i class="fa-solid fa-list" style="color: var(--primary);"></i> Expense History</h3>
+      </div>
+      <div class="table-responsive" style="margin-top: 1rem; max-height: 400px; overflow-y: auto;">
+        <% if (transactions && transactions.length > 0) { %>
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% transactions.forEach(t => { %>
+                <tr id="tr-row-<%= t.id %>">
+                  <td><%= new Date(t.transaction_date).toLocaleDateString('en-IN', {day: '2-digit', month: 'short'}) %></td>
+                  <td>
+                    <% 
+                      let catName = t.category;
+                      if(t.category === 'rent_pg') catName = 'PG Rent';
+                      if(t.category === 'mess_food') catName = 'Mess Food';
+                      if(t.category === 'snacks_cravings') catName = 'Snacks/Cravings';
+                      if(t.category === 'laundry_recharges') catName = 'Laundry/Recharge';
+                    %>
+                    <span class="badge badge-warning" style="text-transform: capitalize;"><%= catName %></span>
+                  </td>
+                  <td><%= t.description || '—' %></td>
+                  <td style="font-weight: 700;">₹<%= parseFloat(t.amount).toFixed(2) %></td>
+                  <td>
+                    <button class="btn btn-danger btn-delete-transaction" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" data-id="<%= t.id %>">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        <% } else { %>
+          <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+            <i class="fa-solid fa-receipt" style="font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>
+            No expenses logged yet.
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT COLUMN: Roommate Split Ledger -->
+  <div style="display: flex; flex-direction: column; gap: 2rem;">
+    <!-- Split Logger Form -->
+    <div class="glass-card">
+      <div class="card-header">
+        <h3 style="font-weight: 700;"><i class="fa-solid fa-user-plus" style="color: var(--secondary);"></i> Split Roommate Bill</h3>
+      </div>
+      <form action="/budget/split" method="POST" style="margin-top: 1rem;">
+        <div class="form-group">
+          <label for="roommate_name" class="form-label">Roommate Name *</label>
+          <input type="text" id="roommate_name" name="roommate_name" class="form-control" placeholder="E.g. Rahul, Amit" required>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label for="split_amount" class="form-label">Split Amount (INR) *</label>
+            <input type="number" step="0.01" id="split_amount" name="amount" class="form-control" placeholder="0.00" required>
+          </div>
+          <div class="form-group">
+            <label for="split_type" class="form-label">Who Paid? *</label>
+            <select id="split_type" name="type" class="form-control" required>
+              <option value="roommate_owes_me">I Paid (They owe me)</option>
+              <option value="i_owe_roommate">They Paid (I owe them)</option>
+            </select>
+          </div>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label for="split_description" class="form-label">What for? *</label>
+            <input type="text" id="split_description" name="description" class="form-control" placeholder="E.g. WiFi bill, Water can split" required>
+          </div>
+          <div class="form-group">
+            <label for="split_date" class="form-label">Date *</label>
+            <input type="date" id="split_date" name="transaction_date" class="form-control" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-primary-reverse" style="margin-top: 0.5rem; width: 100%;">
+          Record Split <i class="fa-solid fa-user-group"></i>
+        </button>
+      </form>
+    </div>
+
+    <!-- Active Balances & Settlement -->
+    <div class="glass-card">
+      <div class="card-header">
+        <h3 style="font-weight: 700;"><i class="fa-solid fa-wallet" style="color: var(--secondary);"></i> Net Balances</h3>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
+        <% if (balances && balances.length > 0) { %>
+          <% balances.forEach(b => { %>
+            <% const bal = parseFloat(b.net_balance || 0); %>
+            <% if(bal !== 0) { %>
+              <div class="glass-card <%= bal > 0 ? 'balance-positive' : 'balance-negative' %>" style="padding: 1rem; display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                  <div style="font-weight: 700;"><%= b.roommate_name %></div>
+                  <div style="font-size: 0.85rem; color: var(--text-muted);">
+                    <%= bal > 0 ? 'owes you' : 'you owe them' %>
+                  </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                  <span style="font-weight: 800; font-size: 1.15rem;" class="<%= bal > 0 ? 'text-positive' : 'text-negative' %>">
+                    ₹<%= Math.abs(bal).toFixed(2) %>
+                  </span>
+                  <form action="/budget/split/settle" method="POST" style="margin: 0;">
+                    <input type="hidden" name="roommate_name" value="<%= b.roommate_name %>">
+                    <button type="submit" class="btn btn-secondary <%= bal > 0 ? 'btn-settle-positive' : 'btn-settle-negative' %>" style="padding: 0.4rem 0.75rem; font-size: 0.8rem;">
+                      Settle
+                    </button>
+                  </form>
+                </div>
+              </div>
+            <% } %>
+          <% }) %>
+        <% } else { %>
+          <div style="text-align: center; padding: 1.5rem; color: var(--text-muted); font-size: 0.9rem;">
+            <i class="fa-solid fa-smile-beam" style="font-size: 1.5rem; display: block; margin-bottom: 0.5rem;"></i>
+            All roommate tabs are fully settled!
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Client side script for deletions -->
+<script>
+  // Set default dates to today
+  document.addEventListener('DOMContentLoaded', () => {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('transaction_date').value = today;
+    document.getElementById('split_date').value = today;
+
+    // Bind delete transaction buttons
+    document.querySelectorAll('.btn-delete-transaction').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        deleteTransaction(id);
+      });
+    });
+  });
+
+  async function deleteTransaction(id) {
+    if(!confirm("Are you sure you want to delete this expense log?")) return;
+    
+    try {
+      const response = await fetch(`/budget/transaction/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      const data = await response.json();
+      if(data.success) {
+        // Remove row from DOM
+        const row = document.getElementById(`tr-row-${id}`);
+        if(row) {
+          row.remove();
+          // Reload page to update calculations
+          window.location.reload();
+        }
+      } else {
+        alert(data.error || "Failed to delete transaction.");
+      }
+    } catch(err) {
+      console.error(err);
+      alert("Error occurred deleting transaction.");
+    }
+  }
+</script>
+
+<%- include('./partials/footer') %>

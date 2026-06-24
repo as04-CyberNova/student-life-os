@@ -1,0 +1,61 @@
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <i class="fa-solid fa-graduation-cap"></i> Student Life OS
+  </div>
+  
+  <ul class="sidebar-menu">
+    <li>
+      <a href="/" class="sidebar-link <%= title.startsWith('Dashboard') ? 'active' : '' %>">
+        <i class="fa-solid fa-chart-line"></i> Dashboard
+      </a>
+    </li>
+    <li>
+      <a href="/budget" class="sidebar-link <%= title.includes('Finances') ? 'active' : '' %>">
+        <i class="fa-solid fa-indian-rupee-sign"></i> Money & Splits
+      </a>
+    </li>
+    <li>
+      <a href="/time" class="sidebar-link <%= title.includes('Time') ? 'active' : '' %>">
+        <i class="fa-solid fa-clock"></i> Time & Chores
+      </a>
+    </li>
+    <li>
+      <a href="/chores" class="sidebar-link <%= title.includes('Chore Tracker') ? 'active' : '' %>">
+        <i class="fa-solid fa-soap"></i> PG Chores
+      </a>
+    </li>
+    
+    <!-- Week 2 & 3 features (Linked directly, will be built) -->
+    <li>
+      <a href="/directory" class="sidebar-link <%= title.includes('Directory') ? 'active' : '' %>">
+        <i class="fa-solid fa-address-book"></i> PG Directory
+      </a>
+    </li>
+    <li>
+      <a href="/academics/explain" class="sidebar-link <%= title.includes('Explain') || title.includes('Gap') || title.includes('Lab') || title.includes('Project') || title.includes('Exam') ? 'active' : '' %>">
+        <i class="fa-solid fa-book-open"></i> Academics Hub
+      </a>
+    </li>
+    <li>
+      <a href="/career/resume" class="sidebar-link <%= title.includes('Resume') || title.includes('Mistake') ? 'active' : '' %>">
+        <i class="fa-solid fa-briefcase"></i> Career Deck
+      </a>
+    </li>
+    <li>
+      <a href="/meals" class="sidebar-link <%= title.includes('Meal') ? 'active' : '' %>">
+        <i class="fa-solid fa-utensils"></i> Meal Planner
+      </a>
+    </li>
+  </ul>
+  
+  <div class="sidebar-footer">
+    <div class="sidebar-user-info">
+      <div class="sidebar-user-name"><%= user.name %></div>
+      <div class="sidebar-user-meta"><%= user.branch %> - Yr <%= user.year_of_study %></div>
+    </div>
+    <a href="/auth/logout" class="sidebar-link sidebar-logout">
+      <i class="fa-solid fa-right-from-bracket"></i> Logout
+    </a>
+  </div>
+</aside>
+

@@ -1,0 +1,266 @@
+<%- include('./partials/header') %>
+
+<div class="card-header" style="margin-bottom: 2rem;">
+  <div>
+    <h1 style="font-size: 2rem; font-weight: 800;">Hostel & PG Chores Tracker</h1>
+    <p style="color: var(--text-muted);">Manage your laundry runs and track your drinking water levels to never run out.</p>
+  </div>
+</div>
+
+<% if (typeof error !== 'undefined' && error) { %>
+  <div class="alert alert-danger"><%= error %></div>
+<% } %>
+<% if (typeof success !== 'undefined' && success) { %>
+  <div class="alert alert-success"><%= success %></div>
+<% } %>
+
+<!-- Two Column Layout: Laundry on Left, Water Can on Right -->
+<div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 2rem; align-items: start;">
+  
+  <!-- Left Side: Laundry Tracker -->
+  <div style="display: flex; flex-direction: column; gap: 2rem;">
+    <!-- Log Laundry Form -->
+    <div class="glass-card">
+      <div class="card-header">
+        <h3 style="font-weight: 700;"><i class="fa-solid fa-shirt" style="color: var(--primary);"></i> Send Clothes to Dhobi</h3>
+      </div>
+      <form action="/chores/laundry" method="POST" style="margin-top: 1rem;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label for="item_count" class="form-label">Number of Items *</label>
+            <input type="number" id="item_count" name="item_count" class="form-control" placeholder="E.g. 10, 15" required min="1">
+          </div>
+          <div class="form-group">
+            <label for="cost" class="form-label">Estimated Cost (INR)</label>
+            <input type="number" id="cost" name="cost" class="form-control" placeholder="E.g. 100.00">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label for="sent_date" class="form-label">Sent Date *</label>
+            <input type="date" id="sent_date" name="sent_date" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="expected_return_date" class="form-label">Expected Return *</label>
+            <input type="date" id="expected_return_date" name="expected_return_date" class="form-control" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="notes" class="form-label">Notes / Special Instructions</label>
+          <input type="text" id="notes" name="notes" class="form-control" placeholder="E.g. 4 jeans, 3 shirts, dry clean blanket">
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">
+          Log Laundry Run <i class="fa-solid fa-soap"></i>
+        </button>
+      </form>
+    </div>
+
+    <!-- Laundry Log History -->
+    <div class="glass-card">
+      <div class="card-header">
+        <h3 style="font-weight: 700;"><i class="fa-solid fa-clock-rotate-left" style="color: var(--primary);"></i> Laundry Logs</h3>
+      </div>
+      <div class="table-responsive" style="margin-top: 1rem; max-height: 400px; overflow-y: auto;">
+        <% if (laundryLogs && laundryLogs.length > 0) { %>
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Items</th>
+                <th>Sent</th>
+                <th>Expected Back</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% laundryLogs.forEach(log => { %>
+                <tr>
+                  <td style="font-weight: 700;">
+                    <%= log.item_count %> clothes
+                    <% if(log.notes) { %>
+                      <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 400;"><%= log.notes %></div>
+                    <% } %>
+                  </td>
+                  <td><%= new Date(log.sent_date).toLocaleDateString('en-IN', {day: '2-digit', month: 'short'}) %></td>
+                  <td><%= new Date(log.expected_return_date).toLocaleDateString('en-IN', {day: '2-digit', month: 'short'}) %></td>
+                  <td>
+                    <% if(log.status === 'with_dhobi') { %>
+                      <span class="badge badge-warning">With Dhobi</span>
+                    <% } else { %>
+                      <span class="badge badge-success">Returned</span>
+                      <div style="font-size: 0.75rem; color: var(--text-muted);">
+                        <%= new Date(log.actual_return_date).toLocaleDateString('en-IN', {day: '2-digit', month: 'short'}) %>
+                      </div>
+                    <% } %>
+                  </td>
+                  <td>
+                    <% if(log.status === 'with_dhobi') { %>
+                      <button class="btn btn-secondary btn-collect-laundry" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" data-id="<%= log.id %>" data-expected="<%= log.expected_return_date %>">
+                        Collect
+                      </button>
+                    <% } else { %>
+                      <span style="font-weight: 700; font-size: 0.85rem; color: var(--success);">
+                        ₹<%= parseFloat(log.cost || 0).toFixed(2) %>
+                      </span>
+                    <% } %>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        <% } else { %>
+          <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+            <i class="fa-solid fa-box-archive" style="font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>
+            No laundry runs logged.
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Side: Drinking Water Tracker -->
+  <div style="display: flex; flex-direction: column; gap: 2rem;">
+    <!-- Active Water Can Info -->
+    <div class="glass-card" style="border-top: 4px solid var(--secondary);">
+      <div class="card-header">
+        <h3 style="font-weight: 700;"><i class="fa-solid fa-droplet" style="color: var(--secondary);"></i> Water Can Status</h3>
+      </div>
+      
+      <div style="margin-top: 1rem; text-align: center; padding: 1rem 0;">
+        <% if (waterCanStatus) { %>
+          <div style="position: relative; width: 140px; height: 140px; margin: 0 auto 1.5rem auto;">
+            <!-- Simple SVG water glass design showing level -->
+            <svg width="100%" height="100%" viewBox="0 0 100 100" style="transform: rotate(-90deg);">
+              <circle cx="50" cy="50" r="40" stroke="rgba(255,255,255,0.05)" stroke-width="8" fill="transparent" />
+              <circle cx="50" cy="50" r="40" stroke="var(--secondary)" stroke-width="8" fill="transparent" 
+                      stroke-dasharray="251.2" id="waterCircle" data-percent="<%= waterCanStatus.percent_remaining %>" />
+            </svg>
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+              <span style="font-size: 1.5rem; font-weight: 800;"><%= waterCanStatus.percent_remaining %>%</span>
+              <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Left</div>
+            </div>
+          </div>
+          
+          <h4 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.25rem;">
+            <%= waterCanStatus.days_remaining %> Day<%= waterCanStatus.days_remaining === 1 ? '' : 's' %> Remaining
+          </h4>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">
+            Opened on: <%= new Date(waterCanStatus.opened_date).toLocaleDateString('en-IN', {day: '2-digit', month: 'short'}) %>
+          </p>
+
+          <% if(waterCanStatus.is_low) { %>
+            <div class="alert alert-danger" style="padding: 0.75rem; margin-top: 0.5rem; border-color: rgba(239, 68, 68, 0.4); text-align: center;">
+              <i class="fa-solid fa-triangle-exclamation"></i> <strong>Water Can is Low!</strong><br>Time to call water delivery.
+            </div>
+          <% } %>
+
+        <% } else { %>
+          <div style="padding: 2rem 0; color: var(--text-muted);">
+            <i class="fa-solid fa-faucet-drip" style="font-size: 3rem; margin-bottom: 1rem; color: var(--text-muted);"></i>
+            <p>No active water can tracked.</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Start New Can Form -->
+    <div class="glass-card">
+      <div class="card-header">
+        <h3 style="font-weight: 700;"><i class="fa-solid fa-circle-plus" style="color: var(--secondary);"></i> Open New Water Can</h3>
+      </div>
+      <form action="/chores/water/open" method="POST" style="margin-top: 1rem;">
+        <div class="form-group">
+          <label for="opened_date" class="form-label">Opened Date *</label>
+          <input type="date" id="opened_date" name="opened_date" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+          <label for="days_to_last" class="form-label">Expected Can Duration (Days) *</label>
+          <input type="number" id="days_to_last" name="days_to_last" class="form-control" value="5" min="1" required>
+          <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Usually lasts 4-6 days for a single student.</div>
+        </div>
+
+        <button type="submit" class="btn btn-secondary" style="width: 100%; border-color: var(--secondary); color: var(--secondary); margin-top: 0.5rem;">
+          Log New Can <i class="fa-solid fa-droplet"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+</div>
+
+<!-- Collect Laundry Dialog/Form Overlay (Simple popup replacement) -->
+<div id="collectLaundryModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; padding: 1rem;">
+  <div class="glass-card" style="width: 100%; max-width: 400px; padding: 2rem; background: var(--bg-dark); border-color: var(--primary);">
+    <div class="card-header">
+      <h3 style="font-weight: 700;"><i class="fa-solid fa-clipboard-check"></i> Collect Laundry</h3>
+    </div>
+    <form id="collectForm" action="" method="POST" style="margin-top: 1rem;">
+      <div class="form-group">
+        <label for="actual_return_date" class="form-label">Return Date *</label>
+        <input type="date" id="actual_return_date" name="actual_return_date" class="form-control" required>
+      </div>
+
+      <div class="form-group">
+        <label for="final_cost" class="form-label">Final Price Paid (INR)</label>
+        <input type="number" id="final_cost" name="final_cost" class="form-control" placeholder="E.g. 120.00">
+      </div>
+
+      <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+        <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="closeSettleModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary" style="flex: 1;">Save Return</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Setup dates on load
+  document.addEventListener('DOMContentLoaded', () => {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('sent_date').value = today;
+    document.getElementById('expected_return_date').value = today;
+    document.getElementById('opened_date').value = today;
+
+    // Set water circle stroke offset dynamically
+    const circle = document.getElementById('waterCircle');
+    if (circle) {
+      const pct = parseFloat(circle.dataset.percent || 100);
+      const offset = 251.2 - (251.2 * pct) / 100;
+      circle.style.strokeDashoffset = offset;
+    }
+
+    // Bind collect buttons click
+    document.querySelectorAll('.btn-collect-laundry').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        const expected = btn.dataset.expected;
+        openSettleModal(id, expected);
+      });
+    });
+  });
+
+  function openSettleModal(id, expectedReturn) {
+    const modal = document.getElementById('collectLaundryModal');
+    const form = document.getElementById('collectForm');
+    const returnDateInput = document.getElementById('actual_return_date');
+    
+    // Set form action destination
+    form.action = `/chores/laundry/${id}/return`;
+    
+    // Set default return date to today
+    const today = new Date().toISOString().split('T')[0];
+    returnDateInput.value = today;
+    
+    modal.style.display = 'flex';
+  }
+
+  function closeSettleModal() {
+    document.getElementById('collectLaundryModal').style.display = 'none';
+  }
+</script>
+
+<%- include('./partials/footer') %>

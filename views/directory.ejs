@@ -1,0 +1,198 @@
+<%- include('./partials/header') %>
+
+<div class="card-header" style="margin-bottom: 2rem;">
+  <div>
+    <h1 style="font-size: 2rem; font-weight: 800;">Local BTech Survival Directory</h1>
+    <p style="color: var(--text-muted);">Quick contact lists for your local PG/hostel ecosystem (Dhobi, water delivery, night kitchens, landlord, etc.)</p>
+  </div>
+</div>
+
+<% if (typeof error !== 'undefined' && error) { %>
+  <div class="alert alert-danger"><%= error %></div>
+<% } %>
+<% if (typeof success !== 'undefined' && success) { %>
+  <div class="alert alert-success"><%= success %></div>
+<% } %>
+
+<!-- Two Column Layout: Add Contact on Left, Contacts Grid on Right -->
+<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; align-items: start;">
+  
+  <!-- Left Side: Add Contact Form -->
+  <div class="glass-card">
+    <div class="card-header">
+      <h3 style="font-weight: 700;"><i class="fa-solid fa-circle-plus" style="color: var(--primary);"></i> Add Service Contact</h3>
+    </div>
+    
+    <form action="/directory" method="POST" style="margin-top: 1rem;">
+      <div class="form-group">
+        <label for="name" class="form-label">Contact / Business Name *</label>
+        <input type="text" id="name" name="name" class="form-control" placeholder="E.g. Gupta Ji Water Can" required>
+      </div>
+
+      <div class="form-group">
+        <label for="service_type" class="form-label">Service Type *</label>
+        <select id="service_type" name="service_type" class="form-control" required>
+          <option value="dhobi">Dhobi (Laundry)</option>
+          <option value="water_delivery">Water Can Delivery</option>
+          <option value="night_food">Night Delivery Kitchen</option>
+          <option value="landlord">Landlord / Owner</option>
+          <option value="warden">Hostel Warden</option>
+          <option value="pharmacy">24/7 Pharmacy</option>
+          <option value="tapri_tea">Chai/Tea Stall (Tapri)</option>
+          <option value="others">Other Service</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="phone" class="form-label">Phone Number *</label>
+        <input type="tel" id="phone" name="phone" class="form-control" placeholder="E.g. +91 98765 43210" required>
+      </div>
+
+      <div class="form-group">
+        <label for="operating_hours" class="form-label">Operating Hours</label>
+        <input type="text" id="operating_hours" name="operating_hours" class="form-control" placeholder="E.g. 9 AM - 9 PM, 24 Hours">
+      </div>
+
+      <div class="form-group">
+        <label for="pricing_info" class="form-label">Pricing / Rates</label>
+        <input type="text" id="pricing_info" name="pricing_info" class="form-control" placeholder="E.g. ₹20 per can, ₹8 per shirt">
+      </div>
+
+      <div class="form-group">
+        <label for="rating" class="form-label">Rating (1 to 5 Stars)</label>
+        <select id="rating" name="rating" class="form-control">
+          <option value="5">⭐⭐⭐⭐⭐ (5/5)</option>
+          <option value="4">⭐⭐⭐⭐ (4/5)</option>
+          <option value="3">⭐⭐⭐ (3/5)</option>
+          <option value="2">⭐⭐ (2/5)</option>
+          <option value="1">⭐ (1/5)</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">
+        Add Service Contact <i class="fa-solid fa-address-book"></i>
+      </button>
+    </form>
+  </div>
+
+  <!-- Right Side: Directory List -->
+  <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+    
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.5rem;">
+      <button class="btn btn-secondary filter-btn active" data-category="all">All Services</button>
+      <button class="btn btn-secondary filter-btn" data-category="dhobi"><i class="fa-solid fa-shirt"></i> Dhobi</button>
+      <button class="btn btn-secondary filter-btn" data-category="water_delivery"><i class="fa-solid fa-droplet"></i> Water</button>
+      <button class="btn btn-secondary filter-btn" data-category="night_food"><i class="fa-solid fa-moon"></i> Night Food</button>
+      <button class="btn btn-secondary filter-btn" data-category="landlord"><i class="fa-solid fa-house"></i> Landlord</button>
+      <button class="btn btn-secondary filter-btn" data-category="warden"><i class="fa-solid fa-user-shield"></i> Warden</button>
+      <button class="btn btn-secondary filter-btn" data-category="pharmacy"><i class="fa-solid fa-prescription-bottle-medical"></i> Pharmacy</button>
+      <button class="btn btn-secondary filter-btn" data-category="tapri_tea"><i class="fa-solid fa-mug-hot"></i> Chai</button>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;" id="contactsGrid">
+      <% if (contacts && contacts.length > 0) { %>
+        <% contacts.forEach(contact => { %>
+          <div class="glass-card contact-card" data-category="<%= contact.service_type %>" style="display: flex; flex-direction: column; justify-content: space-between; position: relative;">
+            
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+                <!-- Category Icon & Badge -->
+                <span class="badge" style="background: rgba(255, 255, 255, 0.05); padding: 0.4rem 0.6rem; text-transform: capitalize; display: flex; align-items: center; gap: 0.4rem;">
+                  <% if (contact.service_type === 'dhobi') { %>
+                    <i class="fa-solid fa-shirt" style="color: var(--primary);"></i> Dhobi
+                  <% } else if (contact.service_type === 'water_delivery') { %>
+                    <i class="fa-solid fa-droplet" style="color: #38bdf8;"></i> Water
+                  <% } else if (contact.service_type === 'night_food') { %>
+                    <i class="fa-solid fa-moon" style="color: #fb7185;"></i> Night Food
+                  <% } else if (contact.service_type === 'landlord') { %>
+                    <i class="fa-solid fa-house" style="color: var(--success);"></i> Landlord
+                  <% } else if (contact.service_type === 'warden') { %>
+                    <i class="fa-solid fa-user-shield" style="color: #fb923c;"></i> Warden
+                  <% } else if (contact.service_type === 'pharmacy') { %>
+                    <i class="fa-solid fa-prescription-bottle-medical" style="color: #f43f5e;"></i> Pharmacy
+                  <% } else if (contact.service_type === 'tapri_tea') { %>
+                    <i class="fa-solid fa-mug-hot" style="color: #eab308;"></i> Chai Stall
+                  <% } else { %>
+                    <i class="fa-solid fa-address-book" style="color: var(--text-muted);"></i> Service
+                  <% } %>
+                </span>
+
+                <!-- Star Rating Display -->
+                <div style="color: #eab308; font-size: 0.85rem;">
+                  <% for(let i=0; i<5; i++) { %>
+                    <i class="<%= i < contact.rating ? 'fa-solid' : 'fa-regular' %> fa-star"></i>
+                  <% } %>
+                </div>
+              </div>
+
+              <!-- Name & Phone -->
+              <h3 style="font-weight: 700; margin-bottom: 0.25rem;"><%= contact.name %></h3>
+              <p style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem;">
+                <a href="tel:<%= contact.phone %>" style="color: var(--primary); display: inline-flex; align-items: center; gap: 0.4rem;">
+                  <i class="fa-solid fa-phone"></i> <%= contact.phone %>
+                </a>
+              </p>
+
+              <!-- Extra Meta Info -->
+              <div style="font-size: 0.85rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 1.5rem;">
+                <% if(contact.operating_hours) { %>
+                  <div><i class="fa-solid fa-clock" style="width: 18px;"></i> <%= contact.operating_hours %></div>
+                <% } %>
+                <% if(contact.pricing_info) { %>
+                  <div><i class="fa-solid fa-indian-rupee-sign" style="width: 18px;"></i> <%= contact.pricing_info %></div>
+                <% } %>
+              </div>
+            </div>
+
+            <!-- Delete Trigger -->
+            <div style="border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 0.75rem; color: var(--text-muted);">Added <%= new Date(contact.created_at).toLocaleDateString('en-IN', {day: '2-digit', month: 'short'}) %></span>
+              <form action="/directory/<%= contact.id %>/delete" method="POST" onsubmit="return confirm('Delete this contact?');">
+                <button type="submit" class="btn btn-secondary" style="padding: 0.3rem 0.6rem; font-size: 0.75rem; color: var(--danger); border-color: rgba(239, 68, 68, 0.2);">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </form>
+            </div>
+
+          </div>
+        <% }) %>
+      <% } else { %>
+        <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem; color: var(--text-muted);" class="glass-card">
+          <i class="fa-solid fa-box-archive" style="font-size: 3rem; margin-bottom: 1rem; color: var(--text-muted); display: block;"></i>
+          <p>No contacts logged in your PG Directory yet.</p>
+          <p style="font-size: 0.85rem; margin-top: 0.5rem;">Fill out the form on the left to add local services (laundry, water suppliers, tea stalls, night delivery kitchens, landlord, etc.)</p>
+        </div>
+      <% } %>
+    </div>
+    
+  </div>
+
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const contactCards = document.querySelectorAll('.contact-card');
+
+    filterButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Toggle active button style
+        filterButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const category = btn.dataset.category;
+
+        // Filter contact cards
+        contactCards.forEach(card => {
+          if (category === 'all' || card.dataset.category === category) {
+            card.style.display = 'flex';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+  });
+</script>
+
+<%- include('./partials/footer') %>
