@@ -478,8 +478,8 @@ const dbWrapper = {
     try {
       return await pool.query(sql, params);
     } catch (err) {
-      if (err.code === 'ECONNREFUSED' || err.code === 'PROTOCOL_CONNECTION_LOST') {
-        console.warn("⚠️ MySQL connection lost. Falling back to local Mock database.");
+      if (err.code === 'ECONNREFUSED' || err.code === 'PROTOCOL_CONNECTION_LOST' || err.code === 'ER_NO_SUCH_TABLE' || err.code === 'ER_BAD_DB_ERROR') {
+        console.warn("⚠️ MySQL error (" + err.code + "). Falling back to local Mock database.");
         useMock = true;
         return executeMockQuery(sql, params);
       }
