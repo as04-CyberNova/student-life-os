@@ -1,143 +1,127 @@
 <%- include('./partials/header') %>
 
-<div class="card-header" style="margin-bottom: 2rem;">
-  <div>
-    <h1 style="font-size: 2rem; font-weight: 800;">Student Life OS Dashboard</h1>
-    <p style="color: var(--text-muted);">Welcome back, <%= user.name %>! Here is your hosteller survival status.</p>
+<header class="header">
+  <div class="header-title">
+    <h2>Student Life OS Dashboard</h2>
+    <p>Welcome back, <%= user.name %>! Here is your hosteller survival status.</p>
   </div>
-</div>
+</header>
 
 <% if (typeof error !== 'undefined' && error) { %>
-  <div class="alert alert-danger"><%= error %></div>
+  <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); color: var(--color-danger); padding: 1rem 1.25rem; border-radius: 12px; margin-bottom: 1.5rem;"><%= error %></div>
 <% } %>
 
-<!-- Main Dashboard Grid -->
-<div class="dashboard-grid">
+<!-- Stats Summary Row -->
+<div class="stats-grid" style="margin-bottom: 2rem;">
   
   <!-- 1. Money Card -->
-  <div class="glass-card" style="border-top: 4px solid var(--primary);">
-    <div class="card-header">
-      <h3 style="font-weight: 700;"><i class="fa-solid fa-wallet" style="color: var(--primary);"></i> Finance Hub</h3>
-      <a href="/budget" style="font-size: 0.85rem; font-weight: 600;">Details <i class="fa-solid fa-arrow-right"></i></a>
+  <div class="card stat-card" style="align-items: flex-start;">
+    <div class="stat-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-dasharray="null" stroke-dashoffset="null" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="stroke: #3b82f6;">
+        <line x1="12" y1="1" x2="12" y2="23"/>
+        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+      </svg>
     </div>
-    <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 1rem;">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <span style="color: var(--text-muted); font-size: 0.9rem;">This Month's Spending:</span>
-        <strong style="font-size: 1.25rem;">₹<%= monthlySpent.toFixed(2) %></strong>
+    <div class="stat-info" style="width: 100%;">
+      <span class="stat-label">Finance Hub</span>
+      <div style="display: flex; justify-content: space-between; margin-top: 0.5rem; align-items: center;">
+        <span style="font-size: 0.8rem; color: var(--text-muted);">Month Spent:</span>
+        <span class="stat-value" style="font-size: 1.1rem;">₹<%= monthlySpent.toFixed(2) %></span>
       </div>
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <span style="color: var(--text-muted); font-size: 0.9rem;">Roommate Balance:</span>
-        <strong style="font-size: 1.25rem;" class="<%= netOwed >= 0 ? 'text-positive' : 'text-negative' %>">
+      <div style="display: flex; justify-content: space-between; margin-top: 0.25rem; align-items: center;">
+        <span style="font-size: 0.8rem; color: var(--text-muted);">Net Balance:</span>
+        <span class="stat-value" style="font-size: 1.1rem; color: <%= netOwed >= 0 ? 'var(--color-safe)' : 'var(--color-danger)' %>;">
           <%= netOwed >= 0 ? '+' : '-' %>₹<%= Math.abs(netOwed).toFixed(2) %>
-        </strong>
+        </span>
       </div>
-      <p style="font-size: 0.75rem; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.5rem; margin-top: 0.5rem;">
-        <%= netOwed >= 0 ? 'Roommates owe you money. Check split tracker.' : 'You owe roommate(s) money. Settle up soon.' %>
-      </p>
+      <a href="/budget" class="btn btn-primary" style="margin-top: 1.2rem; width: 100%; justify-content: center; font-size: 0.8rem; padding: 0.5rem;">Details</a>
     </div>
   </div>
 
   <!-- 2. Time Tracker Card -->
-  <div class="glass-card" style="border-top: 4px solid var(--secondary);">
-    <div class="card-header">
-      <h3 style="font-weight: 700;"><i class="fa-solid fa-clock" style="color: var(--secondary);"></i> Weekly Time Tracker</h3>
-      <a href="/time" style="font-size: 0.85rem; font-weight: 600;">Log Time <i class="fa-solid fa-arrow-right"></i></a>
+  <div class="card stat-card" style="align-items: flex-start;">
+    <div class="stat-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="stroke: #8b5cf6;">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
     </div>
-    <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 1rem;">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <span style="color: var(--text-muted); font-size: 0.9rem;">Target Hours:</span>
-        <strong style="font-size: 1.15rem;"><%= totalTarget.toFixed(1) %> hrs</strong>
+    <div class="stat-info" style="width: 100%;">
+      <span class="stat-label">Weekly Time Tracker</span>
+      <div style="display: flex; justify-content: space-between; margin-top: 0.5rem; align-items: center;">
+        <span style="font-size: 0.8rem; color: var(--text-muted);">Target:</span>
+        <span class="stat-value" style="font-size: 1.1rem;"><%= totalTarget.toFixed(1) %>h</span>
       </div>
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <span style="color: var(--text-muted); font-size: 0.9rem;">Logged Actual:</span>
-        <strong style="font-size: 1.15rem;"><%= totalActual.toFixed(1) %> hrs</strong>
+      <div style="display: flex; justify-content: space-between; margin-top: 0.25rem; align-items: center;">
+        <span style="font-size: 0.8rem; color: var(--text-muted);">Logged:</span>
+        <span class="stat-value" style="font-size: 1.1rem;"><%= totalActual.toFixed(1) %>h</span>
       </div>
-      
       <% const pct = totalTarget > 0 ? Math.min(100, Math.round((totalActual / totalTarget) * 100)) : 0; %>
-      <div>
-        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.25rem;">
-          <span style="color: var(--text-muted);">Week Goal Progress</span>
-          <span style="font-weight: 700;"><%= pct %>%</span>
-        </div>
-        <div class="progress-bar-container">
-          <div class="progress-bar-fill" data-pct="<%= pct %>"></div>
-        </div>
+      <div class="gauge-wrapper" style="width: 100%; margin-top: 1rem; height: 4px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; display: flex;">
+        <div style="width: <%= pct %>%; background: var(--primary); height: 100%;"></div>
       </div>
+      <a href="/time" class="btn btn-primary" style="margin-top: 1.2rem; width: 100%; justify-content: center; font-size: 0.8rem; padding: 0.5rem;">Log Time</a>
     </div>
   </div>
 
   <!-- 3. Chores Tracker Card -->
-  <div class="glass-card" style="border-top: 4px solid var(--success);">
-    <div class="card-header">
-      <h3 style="font-weight: 700;"><i class="fa-solid fa-soap" style="color: var(--success);"></i> Chores & Errands</h3>
-      <a href="/chores" style="font-size: 0.85rem; font-weight: 600;">Tracker <i class="fa-solid fa-arrow-right"></i></a>
+  <div class="card stat-card" style="align-items: flex-start;">
+    <div class="stat-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="stroke: #10b981;">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+      </svg>
     </div>
-    <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 1rem;">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <span style="color: var(--text-muted); font-size: 0.9rem;">Laundry with Dhobi:</span>
-        <strong style="font-size: 1.15rem;" class="<%= activeLaundry > 0 ? 'text-warning-state' : 'text-normal-state' %>">
-          <%= activeLaundry %> run<%= activeLaundry === 1 ? '' : 's' %> pending
-        </strong>
+    <div class="stat-info" style="width: 100%;">
+      <span class="stat-label">Chores & Errands</span>
+      <div style="display: flex; justify-content: space-between; margin-top: 0.5rem; align-items: center;">
+        <span style="font-size: 0.8rem; color: var(--text-muted);">Laundry:</span>
+        <span class="stat-value" style="font-size: 1.1rem; color: <%= activeLaundry > 0 ? 'var(--color-warning)' : 'var(--text-primary)' %>;"><%= activeLaundry %> pending</span>
       </div>
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <span style="color: var(--text-muted); font-size: 0.9rem;">Drinking Water Can:</span>
-        <strong style="font-size: 1.15rem;">
-          <%= waterRemaining !== null ? waterRemaining + '%' : 'No can active' %>
-        </strong>
+      <div style="display: flex; justify-content: space-between; margin-top: 0.25rem; align-items: center;">
+        <span style="font-size: 0.8rem; color: var(--text-muted);">Water Can:</span>
+        <span class="stat-value" style="font-size: 1.1rem;"><%= waterRemaining !== null ? waterRemaining + '%' : 'None' %></span>
       </div>
-      
       <% if (waterRemaining !== null) { %>
-        <div>
-          <div class="progress-bar-container">
-            <div class="progress-bar-fill <%= waterRemaining <= 25 ? 'bg-negative' : 'bg-positive' %>" data-pct="<%= waterRemaining %>"></div>
-          </div>
+        <div class="gauge-wrapper" style="width: 100%; margin-top: 1rem; height: 4px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; display: flex;">
+          <div style="width: <%= waterRemaining %>%; background: <%= waterRemaining <= 25 ? 'var(--color-danger)' : 'var(--color-safe)' %>; height: 100%;"></div>
         </div>
+      <% } else { %>
+        <div style="height: 4px; margin-top: 1rem;"></div>
       <% } %>
+      <a href="/chores" class="btn btn-primary" style="margin-top: 1.2rem; width: 100%; justify-content: center; font-size: 0.8rem; padding: 0.5rem;">Tracker</a>
     </div>
   </div>
-
 </div>
 
-<!-- Academic & Placement Placeholder widgets for upcoming weeks -->
-<h2 style="font-size: 1.5rem; font-weight: 700; margin-top: 3rem; margin-bottom: 1.5rem;">Academic & Career Prep Deck</h2>
-<div class="dashboard-grid">
-  
-  <!-- 4. One-Night-Before Exam Widget (Placeholder) -->
-  <div class="glass-card" style="opacity: 0.7; border-left: 3px solid #f59e0b;">
-    <div class="card-header">
-      <h4 style="font-weight: 700; color: var(--text-muted);"><i class="fa-solid fa-pen-nib"></i> BTech Exam Engine</h4>
-      <span class="badge badge-warning">Week 2</span>
-    </div>
-    <div style="margin-top: 1rem; color: var(--text-muted); font-size: 0.85rem;">
-      <p style="font-weight: 600; color: var(--text-main); margin-bottom: 0.5rem;">Upcoming Exam Prep (80/20 Rule):</p>
-      Logs sessional dates, syllabus topics, and links standard YouTube lectures/cheat-sheets.
+<div class="charts-grid">
+  <!-- Placeholders mapped to CareerShield structure -->
+  <div class="card details-card">
+    <div class="section-block">
+      <h3 style="display: flex; align-items: center; gap: 0.5rem; font-size: 1rem;">
+        <svg viewBox="0 0 24 24" width="18" height="18" stroke="var(--color-warning)" stroke-width="2" fill="none"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        Upcoming Exam Prep (80/20)
+      </h3>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.75rem;">Logs sessional dates, syllabus topics, and links standard YouTube lectures/cheat-sheets.</p>
     </div>
   </div>
-
-  <!-- 5. Resume Builder Widget (Placeholder) -->
-  <div class="glass-card" style="opacity: 0.7; border-left: 3px solid #3b82f6;">
-    <div class="card-header">
-      <h4 style="font-weight: 700; color: var(--text-muted);"><i class="fa-solid fa-file-invoice"></i> Resume Truth Checker</h4>
-      <span class="badge badge-warning">Week 3</span>
-    </div>
-    <div style="margin-top: 1rem; color: var(--text-muted); font-size: 0.85rem;">
-      <p style="font-weight: 600; color: var(--text-main); margin-bottom: 0.5rem;">Score Resume Bullet Points:</p>
-      Auto-grade bullet points on metric usage, action words, and GitHub code proof links.
+  <div class="card details-card">
+    <div class="section-block">
+      <h3 style="display: flex; align-items: center; gap: 0.5rem; font-size: 1rem;">
+        <svg viewBox="0 0 24 24" width="18" height="18" stroke="var(--primary)" stroke-width="2" fill="none"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        Hostel Fix-It Hub
+      </h3>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.75rem;">Track Wi-Fi complaints, leaking taps, and request room cleanings with real-time status.</p>
     </div>
   </div>
-
-  <!-- 6. Meal Optimizer Widget (Placeholder) -->
-  <div class="glass-card" style="opacity: 0.7; border-left: 3px solid #10b981;">
-    <div class="card-header">
-      <h4 style="font-weight: 700; color: var(--text-muted);"><i class="fa-solid fa-apple-whole"></i> PG Meal & Craving Solver</h4>
-      <span class="badge badge-warning">Week 3</span>
-    </div>
-    <div style="margin-top: 1rem; color: var(--text-muted); font-size: 0.85rem;">
-      <p style="font-weight: 600; color: var(--text-main); margin-bottom: 0.5rem;">Midnight Pantry Recipe Solver:</p>
-      Match kettle/induction recipes dynamically using whatever ingredients are left in your room.
+  <div class="card details-card">
+    <div class="section-block">
+      <h3 style="display: flex; align-items: center; gap: 0.5rem; font-size: 1rem;">
+        <svg viewBox="0 0 24 24" width="18" height="18" stroke="var(--color-safe)" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
+        PG Meal & Craving Solver
+      </h3>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.75rem;">Match kettle/induction recipes dynamically using whatever ingredients are left in your room.</p>
     </div>
   </div>
-
 </div>
 
 <%- include('./partials/footer') %>

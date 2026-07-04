@@ -10,6 +10,7 @@ router.post('/register', ensureGuest, authController.postRegister);
 // Login paths
 router.get('/login', ensureGuest, authController.getLogin);
 router.post('/login', ensureGuest, authController.postLogin);
+router.post('/guest', ensureGuest, authController.guestLogin);
 
 // Logout path
 router.get('/logout', authController.logout);

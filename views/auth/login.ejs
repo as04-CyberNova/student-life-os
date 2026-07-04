@@ -27,8 +27,20 @@
         <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required autocomplete="current-password">
       </div>
 
-      <button type="submit" class="btn btn-primary auth-btn">
+      <button type="submit" class="btn btn-primary auth-btn" style="width: 100%; justify-content: center;">
         Sign In <i class="fa-solid fa-right-to-bracket"></i>
+      </button>
+    </form>
+
+    <div style="margin-top: 1rem; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+      <div style="flex: 1; height: 1px; background: var(--border-light);"></div>
+      <span style="color: var(--text-muted); font-size: 0.85rem; font-weight: 500;">OR</span>
+      <div style="flex: 1; height: 1px; background: var(--border-light);"></div>
+    </div>
+
+    <form action="/auth/guest" method="POST">
+      <button type="submit" class="btn auth-btn" style="width: 100%; justify-content: center; background: rgba(255,255,255,0.05); border: 1px solid var(--border-light); color: var(--text-primary);">
+        <i class="fa-solid fa-user-secret"></i> Continue as Guest
       </button>
     </form>
 

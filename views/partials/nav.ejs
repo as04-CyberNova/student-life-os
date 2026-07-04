@@ -1,61 +1,105 @@
-<aside class="sidebar">
-  <div class="sidebar-brand">
-    <i class="fa-solid fa-graduation-cap"></i> Student Life OS
+<aside id="sidebar" class="sidebar">
+  <div>
+    <a href="/" class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/>
+          <path d="M9 11l2 2 4-4" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span class="brand-name">Student Life OS</span>
+    </a>
+
+    <ul class="nav-links">
+      <li class="nav-item <%= title.startsWith('Dashboard') ? 'active' : '' %>">
+        <a href="/" class="nav-btn" style="text-decoration: none;">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3" y="3" width="7" height="9" rx="1" />
+            <rect x="14" y="3" width="7" height="5" rx="1" />
+            <rect x="14" y="12" width="7" height="9" rx="1" />
+            <rect x="3" y="16" width="7" height="5" rx="1" />
+          </svg>
+          Dashboard
+        </a>
+      </li>
+      <li class="nav-item <%= title.includes('Finances') ? 'active' : '' %>">
+        <a href="/budget" class="nav-btn" style="text-decoration: none;">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <line x1="12" y1="1" x2="12" y2="23"/>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+          Money & Splits
+        </a>
+      </li>
+      <li class="nav-item <%= title.includes('Time') ? 'active' : '' %>">
+        <a href="/time" class="nav-btn" style="text-decoration: none;">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          Time & Chores
+        </a>
+      </li>
+      <li class="nav-item <%= title.includes('Chore Tracker') ? 'active' : '' %>">
+        <a href="/chores" class="nav-btn" style="text-decoration: none;">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          </svg>
+          PG Chores
+        </a>
+      </li>
+      
+      <!-- Week 2 & 3 features -->
+      <li class="nav-item <%= title.includes('Directory') ? 'active' : '' %>">
+        <a href="/directory" class="nav-btn" style="text-decoration: none;">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="8.5" cy="7" r="4"/>
+            <polyline points="17 11 19 13 23 9"/>
+          </svg>
+          PG Directory
+        </a>
+      </li>
+      <li class="nav-item <%= title.includes('Explain') || title.includes('Gap') || title.includes('Lab') || title.includes('Project') || title.includes('Exam') ? 'active' : '' %>">
+        <a href="/academics/explain" class="nav-btn" style="text-decoration: none;">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+          </svg>
+          Academics Hub
+        </a>
+      </li>
+      <li class="nav-item <%= title.includes('Fix-It') || title.includes('Complaint') ? 'active' : '' %>">
+        <a href="/complaints" class="nav-btn" style="text-decoration: none;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+          </svg>
+          Hostel Fix-It
+        </a>
+      </li>
+      <li class="nav-item <%= title.includes('Meal') ? 'active' : '' %>">
+        <a href="/meals" class="nav-btn" style="text-decoration: none;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            <path d="M2 12h20"/>
+          </svg>
+          Meal Planner
+        </a>
+      </li>
+    </ul>
   </div>
   
-  <ul class="sidebar-menu">
-    <li>
-      <a href="/" class="sidebar-link <%= title.startsWith('Dashboard') ? 'active' : '' %>">
-        <i class="fa-solid fa-chart-line"></i> Dashboard
-      </a>
-    </li>
-    <li>
-      <a href="/budget" class="sidebar-link <%= title.includes('Finances') ? 'active' : '' %>">
-        <i class="fa-solid fa-indian-rupee-sign"></i> Money & Splits
-      </a>
-    </li>
-    <li>
-      <a href="/time" class="sidebar-link <%= title.includes('Time') ? 'active' : '' %>">
-        <i class="fa-solid fa-clock"></i> Time & Chores
-      </a>
-    </li>
-    <li>
-      <a href="/chores" class="sidebar-link <%= title.includes('Chore Tracker') ? 'active' : '' %>">
-        <i class="fa-solid fa-soap"></i> PG Chores
-      </a>
-    </li>
-    
-    <!-- Week 2 & 3 features (Linked directly, will be built) -->
-    <li>
-      <a href="/directory" class="sidebar-link <%= title.includes('Directory') ? 'active' : '' %>">
-        <i class="fa-solid fa-address-book"></i> PG Directory
-      </a>
-    </li>
-    <li>
-      <a href="/academics/explain" class="sidebar-link <%= title.includes('Explain') || title.includes('Gap') || title.includes('Lab') || title.includes('Project') || title.includes('Exam') ? 'active' : '' %>">
-        <i class="fa-solid fa-book-open"></i> Academics Hub
-      </a>
-    </li>
-    <li>
-      <a href="/career/resume" class="sidebar-link <%= title.includes('Resume') || title.includes('Mistake') ? 'active' : '' %>">
-        <i class="fa-solid fa-briefcase"></i> Career Deck
-      </a>
-    </li>
-    <li>
-      <a href="/meals" class="sidebar-link <%= title.includes('Meal') ? 'active' : '' %>">
-        <i class="fa-solid fa-utensils"></i> Meal Planner
-      </a>
-    </li>
-  </ul>
-  
-  <div class="sidebar-footer">
-    <div class="sidebar-user-info">
-      <div class="sidebar-user-name"><%= user.name %></div>
-      <div class="sidebar-user-meta"><%= user.branch %> - Yr <%= user.year_of_study %></div>
-    </div>
-    <a href="/auth/logout" class="sidebar-link sidebar-logout">
-      <i class="fa-solid fa-right-from-bracket"></i> Logout
+  <div class="sidebar-footer" style="padding-top: 0.5rem; margin-top: auto;">
+    <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem;"><%= user.name %></div>
+    <div style="font-size: 0.72rem; color: var(--text-secondary); margin-bottom: 0.75rem;"><%= user.branch %> - Yr <%= user.year_of_study %></div>
+    <a href="/auth/logout" class="btn" style="font-size: 0.75rem; padding: 0.4rem 0.85rem; width: 100%; justify-content: center; background: rgba(255,255,255,0.03); border: 1px solid var(--border-light); color: var(--text-primary); text-decoration: none; display: flex; align-items: center; gap: 0.5rem;">
+      <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2" style="flex-shrink:0;">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+        <polyline points="16 17 21 12 16 7"/>
+        <line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+      Logout
     </a>
   </div>
 </aside>
-

@@ -4,10 +4,14 @@ const path = require('path');
 require('dotenv').config();
 
 // Path to store mock data if MySQL is offline
-const MOCK_DB_PATH = path.join(__dirname, 'mockDb.json');
+const MOCK_DB_PATH = process.env.MOCK_DB_PATH || path.join(__dirname, 'mockDb.json');
 
 // Helper to load/save mock database
 function loadMockDb() {
+  const dir = path.dirname(MOCK_DB_PATH);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
   if (!fs.existsSync(MOCK_DB_PATH)) {
     // Seed default database structures
     const defaultDb = {
@@ -59,6 +63,10 @@ function loadMockDb() {
 }
 
 function saveMockDb(data) {
+  const dir = path.dirname(MOCK_DB_PATH);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
   fs.writeFileSync(MOCK_DB_PATH, JSON.stringify(data, null, 2), 'utf8');
 }
 

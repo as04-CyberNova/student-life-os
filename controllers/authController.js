@@ -125,6 +125,19 @@ const authController = {
     }
   },
 
+  // Handle guest login
+  guestLogin(req, res) {
+    req.session.user = {
+      id: 'guest_' + Date.now(),
+      name: 'Guest Explorer',
+      email: 'guest@studentlife.os',
+      college: 'Demo University',
+      branch: 'Guest Branch',
+      year_of_study: 1
+    };
+    res.redirect('/');
+  },
+
   // Handle logout
   async logout(req, res) {
     req.session.destroy((err) => {

@@ -46,8 +46,8 @@ app.use('/exams', examRoutes);
 app.use('/', indexRoutes);
 
 // Week 2 & 3 Placeholder Routes (to keep sidebar links functional)
-app.get('/career/resume', ensureAuth, (req, res) => {
-  res.render('career/resume-checker', { title: 'Resume Truth Checker - Student Life OS', user: req.session.user });
+app.get('/complaints', ensureAuth, (req, res) => {
+  res.render('complaints', { title: 'Hostel Fix-It - Student Life OS', user: req.session.user });
 });
 app.get('/meals', ensureAuth, (req, res) => {
   res.render('meals', { title: 'Meal Planner - Student Life OS', user: req.session.user });
