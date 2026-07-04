@@ -657,6 +657,9 @@ body.sidebar-open .sidebar-overlay {
    ============================================================ */
 .main-content {
   display: flex;
+  flex: 1;
+  min-width: 0;
+  width: 100%;
   flex-direction: column;
   padding: 2.5rem 3.5rem;
   height: 100vh;
@@ -2743,22 +2746,13 @@ select.textarea-input {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  width: 100vw;
-  margin-left: -3.5rem; /* Offset main-content padding */
+  min-height: calc(100vh - 5rem);
+  width: 100%;
   padding: 2rem;
   background-color: var(--bg-body);
   background-image: 
     radial-gradient(circle at 15% 50%, rgba(14, 165, 233, 0.05), transparent 30%),
     radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.05), transparent 30%);
-}
-
-@media (max-width: 1024px) {
-  .auth-container { margin-left: -2rem; }
-}
-
-@media (max-width: 480px) {
-  .auth-container { margin-left: -1rem; }
 }
 
 .auth-card-login {
