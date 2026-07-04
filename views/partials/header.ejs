@@ -32,7 +32,7 @@
   <!-- Mobile Sidebar Overlay Backdrop -->
   <div id="sidebar-overlay" class="sidebar-overlay"></div>
 
-  <div class="app-container">
+  <div class="app-container <%= (typeof user === 'undefined' || !user) ? 'no-sidebar' : '' %>">
     <% if (typeof user !== 'undefined' && user) { %>
       <%- include('./nav') %>
     <% } %>

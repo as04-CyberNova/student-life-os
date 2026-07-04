@@ -490,8 +490,26 @@ body.sidebar-open .sidebar-overlay {
   width: 100%;
   min-height: 100vh;
   min-height: 100dvh;
+  background-color: var(--bg-body);
+  position: relative;
 }
 
+.app-container.no-sidebar {
+  grid-template-columns: 1fr !important;
+  width: 100vw !important;
+}
+
+.app-container.no-sidebar .main-content {
+  padding: 0 !important;
+  height: 100dvh !important;
+}
+
+/* Hide hamburger & overlay when there's no sidebar (auth pages) */
+.app-container.no-sidebar ~ * .hamburger-btn,
+body:has(.app-container.no-sidebar) .hamburger-btn,
+body:has(.app-container.no-sidebar) .sidebar-overlay {
+  display: none !important;
+}
 /* ============================================================
    SIDEBAR NAVIGATION
    ============================================================ */
@@ -2746,7 +2764,7 @@ select.textarea-input {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: calc(100vh - 5rem);
+  min-height: 100dvh;
   width: 100%;
   padding: 2rem;
   background-color: var(--bg-body);
