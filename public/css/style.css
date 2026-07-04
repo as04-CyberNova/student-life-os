@@ -2744,11 +2744,21 @@ select.textarea-input {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
+  width: 100vw;
+  margin-left: -3.5rem; /* Offset main-content padding */
   padding: 2rem;
   background-color: var(--bg-body);
   background-image: 
     radial-gradient(circle at 15% 50%, rgba(14, 165, 233, 0.05), transparent 30%),
     radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.05), transparent 30%);
+}
+
+@media (max-width: 1024px) {
+  .auth-container { margin-left: -2rem; }
+}
+
+@media (max-width: 480px) {
+  .auth-container { margin-left: -1rem; }
 }
 
 .auth-card-login {
@@ -2789,6 +2799,33 @@ select.textarea-input {
   color: var(--text-secondary);
   font-size: 0.9rem;
   line-height: 1.5;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.form-control {
+  width: 100%;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  padding: 0.85rem 1.1rem;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.form-control:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
+  background: rgba(15, 23, 42, 0.8);
+  outline: none;
 }
 
 .auth-footer {
